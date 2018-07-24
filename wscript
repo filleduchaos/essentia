@@ -55,6 +55,14 @@ def options(ctx):
                    dest='CROSS_COMPILE_ANDROID_ARM64', default=False,
                    help='cross-compile for Android (ARM64) using toolchain')
 
+    ctx.add_option('--cross-compile-android-x86', action='store_true',
+                   dest='CROSS_COMPILE_ANDROID_X86', default=False,
+                   help='cross-compile for Android (x86) using toolchain')
+
+    ctx.add_option('--cross-compile-android-x86_64', action='store_true',
+                   dest='CROSS_COMPILE_ANDROID_X86_64', default=False,
+                   help='cross-compile for Android (x86_64) using toolchain')
+
     ctx.add_option('--cross-compile-ios', action='store_true',
                    dest='CROSS_COMPILE_IOS', default=False,
                    help='cross-compile for iOS (ARMv7 and ARM64)')
@@ -103,11 +111,8 @@ def configure(ctx):
         and not ctx.options.CROSS_COMPILE_ANDROID
         and not ctx.options.CROSS_COMPILE_ANDROID_ARM64
         and not ctx.options.CROSS_COMPILE_IOS
-        and not ctx.options.CROSS_COMPILE_IOS_SIM
         and not ctx.options.CROSS_COMPILE_IOS_ARM
         and not ctx.options.CROSS_COMPILE_IOS_ARM64
-        and not ctx.options.CROSS_COMPILE_IOS_X86
-        and not ctx.options.CROSS_COMPILE_IOS_X86_64
     ):
         ctx.env.CXXFLAGS += ['-msse', '-msse2', '-mfpmath=sse']
 
@@ -213,6 +218,20 @@ def configure(ctx):
         ctx.find_program('aarch64-linux-android-gcc', var='CC')
         ctx.find_program('aarch64-linux-android-g++', var='CXX')
         ctx.find_program('aarch64-linux-android-ar', var='AR')
+        ctx.env.LINKFLAGS += ['-Wl,-soname,libessentia.so']
+
+    if ctx.options.CROSS_COMPILE_ANDROID_X86:
+        print ("→ Cross-compiling for Android x86")
+        ctx.find_program('i686-linux-android-gcc', var='CC')
+        ctx.find_program('i686-linux-android-g++', var='CXX')
+        ctx.find_program('i686-linux-android-ar', var='AR')
+        ctx.env.LINKFLAGS += ['-Wl,-soname,libessentia.so']
+
+    if ctx.options.CROSS_COMPILE_ANDROID_X86_64:
+        print ("→ Cross-compiling for Android x86_64")
+        ctx.find_program('x86_64-linux-android-gcc', var='CC')
+        ctx.find_program('x86_64-linux-android-g++', var='CXX')
+        ctx.find_program('x86_64-linux-android-ar', var='AR')
         ctx.env.LINKFLAGS += ['-Wl,-soname,libessentia.so']
 
     if ctx.options.CROSS_COMPILE_IOS:
