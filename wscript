@@ -51,6 +51,14 @@ def options(ctx):
                    dest='CROSS_COMPILE_ANDROID', default=False,
                    help='cross-compile for Android using toolchain')
 
+    ctx.add_option('--cross-compile-android-arm', action='store_true',
+                   dest='CROSS_COMPILE_ANDROID_ARM', default=False,
+                   help='cross-compile for Android using toolchain')
+
+    ctx.add_option('--cross-compile-android-armv7', action='store_true',
+                   dest='CROSS_COMPILE_ANDROID_ARMV7', default=False,
+                   help='cross-compile for Android using toolchain')
+
     ctx.add_option('--cross-compile-android-arm64', action='store_true',
                    dest='CROSS_COMPILE_ANDROID_ARM64', default=False,
                    help='cross-compile for Android (ARM64) using toolchain')
@@ -71,8 +79,8 @@ def options(ctx):
                    dest='CROSS_COMPILE_IOS_SIM', default=False,
                    help='cross-compile for iOS (i386)')
 
-    ctx.add_option('--cross-compile-ios-arm', action='store_true',
-                   dest='CROSS_COMPILE_IOS_ARM', default=False,
+    ctx.add_option('--cross-compile-ios-armv7', action='store_true',
+                   dest='CROSS_COMPILE_IOS_ARMV7', default=False,
                    help='cross-compile for iOS (ARMv7)')
 
     ctx.add_option('--cross-compile-ios-arm64', action='store_true',
@@ -109,9 +117,11 @@ def configure(ctx):
     if (
         not ctx.options.EMSCRIPTEN
         and not ctx.options.CROSS_COMPILE_ANDROID
+        and not ctx.options.CROSS_COMPILE_ANDROID_ARM
+        and not ctx.options.CROSS_COMPILE_ANDROID_ARMV7
         and not ctx.options.CROSS_COMPILE_ANDROID_ARM64
         and not ctx.options.CROSS_COMPILE_IOS
-        and not ctx.options.CROSS_COMPILE_IOS_ARM
+        and not ctx.options.CROSS_COMPILE_IOS_ARMV7
         and not ctx.options.CROSS_COMPILE_IOS_ARM64
     ):
         ctx.env.CXXFLAGS += ['-msse', '-msse2', '-mfpmath=sse']
@@ -206,7 +216,7 @@ def configure(ctx):
             distutils.dir_util.copy_tree(win_path + "/" + lib + "/include", tdm_include)
             distutils.dir_util.copy_tree(win_path + "/" + lib + "/lib", tdm_lib)
 
-    if ctx.options.CROSS_COMPILE_ANDROID:
+    if ctx.options.CROSS_COMPILE_ANDROID or ctx.options.CROSS_COMPILE_ANDROID_ARM or ctx.options.CROSS_COMPILE_ANDROID_ARMV7:
         print ("→ Cross-compiling for Android ARM")
         ctx.find_program('arm-linux-androideabi-gcc', var='CC')
         ctx.find_program('arm-linux-androideabi-g++', var='CXX')
@@ -261,7 +271,7 @@ def configure(ctx):
         ctx.env.CXXFLAGS += ['-miphoneos-version-min=5.0']
         ctx.env.CXXFLAGS += ['-isysroot', '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk']
 
-    if ctx.options.CROSS_COMPILE_IOS_ARM:
+    if ctx.options.CROSS_COMPILE_IOS_ARMV7:
         print ("→ Cross-compiling for iOS (ARMv7)")
         ctx.env.CXXFLAGS += ['-arch', 'armv7']
         ctx.env.LINKFLAGS += ['-arch', 'armv7']
